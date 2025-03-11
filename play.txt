@@ -1,0 +1,88 @@
+4. API Structure (Example Endpoints)
+User Authentication
+✅ POST /api/users/register/ – Register a new user.
+✅ POST /api/users/login/ – Authenticate user.
+
+Store Management
+✅ GET /api/stores/ – Get all stores.
+✅ POST /api/stores/ – Create a new store.
+
+Products & Categories
+✅ GET /api/products/?store=<store_id> – Get products by store.
+✅ POST /api/products/ – Add new product.
+
+Cart & Orders
+✅ POST /api/cart/add/ – Add product to cart.
+✅ POST /api/orders/create/ – Place an order.
+
+Payments
+✅ POST /api/payments/process/ – Process payment.
+
+
+
+4. Cart & Orders (Orders App)
+Allows customers to add products to their cart, place orders, and track them.
+
+✅ Add a product to cart
+POST /api/cart/add/
+📌 Request:
+get's cart that belongs to request.user and  is having status=active
+{
+    "product_id": 1,
+    "quantity": 2
+}
+📌 Response:
+
+{
+    "message": "Product added to cart!"
+}
+
+✅ View cart items
+GET /api/cart/?store_id={store_id}
+📌 Response:
+
+
+[
+    {
+        "product_name": "Leather Jacket",
+        "quantity": 2,
+        "price": 79.99
+    },
+    {
+        "product"_name: "Leather Jacket 2",
+        "quantity": 3,
+        "price": 67.99
+    }
+]
+✅ Place an order
+POST /api/orders/create/
+📌 Request:
+once the cart is added to an order, it's status is changed to inactive and a new cart is created for that user 
+{
+    "cart_id": 1,
+    "payment_method": "credit_card",
+    "shipping_address": "no 1 lessel dadadada, USA"
+}
+📌 Response:
+
+
+{
+    "message": "Order placed successfully!",
+    "order_id": 1001
+}
+✅ Get order details
+GET /api/orders/{order_id}/
+📌 Response:
+
+
+{
+    "id": 1001,
+    "status": "Processing",
+    "items": [
+        {
+            "product": "Leather Jacket",
+            "quantity": 2,
+            "price": 79.99
+        }
+    ]
+}
