@@ -15,7 +15,7 @@ class Category(models.Model):
 
 
 class Image(models.Model):
-    image = CloudinaryField("products/images")
+    image = CloudinaryField("products/images", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

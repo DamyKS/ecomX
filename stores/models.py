@@ -14,7 +14,7 @@ class Store(models.Model):
     # description = models.TextField(blank=True, null=True)
     hero_name = models.CharField(max_length=255, null=True, blank=True)
     hero_description = models.TextField(blank=True, null=True)
-    hero_image = CloudinaryField("stores/images")
+    hero_image = CloudinaryField("stores/images", null=True)
     template = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
