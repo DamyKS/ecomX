@@ -18,14 +18,22 @@ from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
 from orders.models import Cart
+from stores.models import Store
 
 
 class RegisterView(APIView):
     def post(self, request):
+        user_type = request.data.get("user_type")
+
         user_serializer = UserSerializer(data=request.data)
         if user_serializer.is_valid():
             user = user_serializer.save()
             user.set_password(user_serializer.validated_data["password"])
+            if user_type == "customer":
+                store_id = request.data.get("store_id")
+                store = Store.objects.get(id=store_id)
+                store.customers.add(user)
+            user.save()
             user_data = UserSerializer(user).data
             return Response(user_data, status=status.HTTP_201_CREATED)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
