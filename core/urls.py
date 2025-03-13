@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 
 # from bank.views import TransferAPIView
 from products.views import CategoryAPIView
+from whatsapp_bot import views
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -52,6 +53,8 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
+    # accounts
+    path("api/v1/accounts/", include("accounts.urls")),
     # stores urls
     path("api/v1/stores/", include("stores.urls")),
     # products and categories urls
@@ -61,6 +64,10 @@ urlpatterns = [
     path("api/v1/orders/", include("orders.urls")),
     # payments urls
     path("api/v1/payments/", include("payments.urls")),
+    # seller dashboard urls
+    path("api/v1/seller_dashboard/", include("seller_dashboard.urls")),
+    # whatsapp bot urls
+    # path("api/v1/whatsapp_bot/message", views.message, name="whatsapp_bot"),
     # # Swagger UI
     path(
         "swagger/",

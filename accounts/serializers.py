@@ -84,3 +84,23 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         write_only=True, validators=[validate_password]
     )
     token = serializers.CharField()
+
+
+class MeUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "full_name",
+            "phone_number",
+            "is_email_verified",
+            "user_type",
+            "preferred_language",
+            "created_at",
+            "updated_at",
+            # "password",
+            # "password2",
+        )
+        read_only_fields = ("created_at", "updated_at")

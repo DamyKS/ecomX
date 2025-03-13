@@ -12,6 +12,7 @@ from .serializers import (
     UserSerializer,
     PasswordResetSerializer,
     PasswordResetConfirmSerializer,
+    MeUserSerializer,
 )
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
@@ -19,6 +20,7 @@ from django.contrib.auth.hashers import check_password
 User = get_user_model()
 from orders.models import Cart
 from stores.models import Store
+from seller_dashboard.models import Dashboard
 
 
 class RegisterView(APIView):
@@ -33,6 +35,9 @@ class RegisterView(APIView):
                 store_id = request.data.get("store_id")
                 store = Store.objects.get(id=store_id)
                 store.customers.add(user)
+            elif user_type == "seller":
+                seller_dashboard = Dashboard.objects.create(owner=user)
+                seller_dashboard.save()
             user.save()
             user_data = UserSerializer(user).data
             return Response(user_data, status=status.HTTP_201_CREATED)
@@ -209,3 +214,11 @@ class ChangePasswordView(APIView):
         return Response(
             {"message": "Password changed successfully"}, status=status.HTTP_200_OK
         )
+
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = MeUserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
