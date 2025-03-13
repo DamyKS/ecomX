@@ -66,7 +66,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
         source="category",
-        write_only=True,
+        # write_only=True,
         required=False,
     )
     # Accept multiple image files from the request
