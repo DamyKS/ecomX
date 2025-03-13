@@ -222,13 +222,22 @@ class MeView(APIView):
     def get(self, request):
         user = request.user
         store_id = None
+
         if user.user_type == "seller":
+            print("of type seller ")
             try:
                 store = Store.objects.get(owner=user)
                 store_id = store.id
+                print("id", store_id)
             except Store.DoesNotExist:
                 pass
-        serializer = MeUserSerializer(request.user)
+
+        serializer = MeUserSerializer(user)
+        user_data = (
+            serializer.data.copy()
+        )  # Copy serializer data to a mutable dictionary
+
         if store_id:
-            serializer.data["store_id"] = store_id
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            user_data["store_id"] = store_id  # Add store_id to the copied data
+
+        return Response(user_data, status=status.HTTP_200_OK)
