@@ -223,7 +223,7 @@ class MeView(APIView):
         user = request.user
         store_id = None
         if user.user_type == "seller":
-            store = user.owned_stores
+            store = Store.objects.get(owner=user)
             store_id = store.id
         serializer = MeUserSerializer(request.user)
         if store_id:
