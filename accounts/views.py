@@ -221,6 +221,7 @@ class MeView(APIView):
 
     def get(self, request):
         user = request.user
+        store_id = None
         if user.user_type == "seller":
             store = user.owned_stores
             store_id = store.id
