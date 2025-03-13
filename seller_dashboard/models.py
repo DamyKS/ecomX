@@ -4,6 +4,9 @@ import uuid
 
 User = get_user_model()
 
+class LoanSummary(models.Model):
+    eligibility_score = models.IntegerField(default=0)
+    max_loan_amount= models.
 
 class Dashboard(models.Model):
     owner = models.ForeignKey(

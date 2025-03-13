@@ -220,5 +220,11 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        user = request.user
+        if user.user_type == "seller":
+            store = user.owned_stores
+            store_id = store.id
         serializer = MeUserSerializer(request.user)
+        if store_id:
+            serializer.data["store_id"] = store_id
         return Response(serializer.data, status=status.HTTP_200_OK)
