@@ -223,8 +223,11 @@ class MeView(APIView):
         user = request.user
         store_id = None
         if user.user_type == "seller":
-            store = Store.objects.get(owner=user)
-            store_id = store.id
+            try:
+                store = Store.objects.get(owner=user)
+                store_id = store.id
+            except Store.DoesNotExist:
+                pass
         serializer = MeUserSerializer(request.user)
         if store_id:
             serializer.data["store_id"] = store_id
