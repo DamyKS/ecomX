@@ -147,6 +147,15 @@ class CreateOrderAPIView(APIView):
     def post(self, request):
         user = request.user
         cart = get_object_or_404(Cart, user=user, status="active")
+        try:
+
+            store = cart.store
+            dashboard = get_object_or_404(Dashboard, owner=store.owner)
+            dashboard.elegibility_score += 10
+            dashboard.save()
+        except:
+            pass
+
         payment_method = request.data.get("payment_method")
         shipping_address = request.data.get("shipping_address")
 

@@ -616,8 +616,8 @@ def message(request):
 
     else:
         response.message(
-            f"Hello {seller.full_name}! Welcome to {store} WhatsApp manager.\n"
-            "Type 'help' to see available commands."
+            f"Hello {seller.full_name}! Welcome to {store.name} WhatsApp manager.\n"
+            "Type *'help'* to see available commands."
         )
 
     return HttpResponse(str(response))
