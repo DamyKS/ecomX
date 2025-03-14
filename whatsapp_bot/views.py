@@ -31,16 +31,20 @@ TWILIO_ACCOUNT_SID = config("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = config("TWILIO_AUTH_TOKEN")
 
 # Command structure and help information
+# Update the COMMANDS dictionary to include the new category commands
 COMMANDS = {
     "help": "Show available commands",
     "orders": "List recent orders",
     "products": "List your products",
+    "categories": "List your categories",
     "add product": "Add a new product (follow format: add product NAME|CATEGORY|PRICE|DESCRIPTION|STOCK). Attach images to add them to the product.",
     "update product": "Update a product (format: update product ID|NAME|CATEGORY|PRICE|DESCRIPTION|STOCK)",
     "delete product": "Delete a product (format: delete product ID)",
+    "add category": "Add a new category (format: add category NAME)",
+    "edit category": "Edit a category (format: edit category OLD_NAME|NEW_NAME)",
+    "delete category": "Delete a category (format: delete category NAME)",
     "stats": "Show store statistics",
     "ai": "Ask a question to the AI model (format: ai QUESTION)",
-    # "product [ID]": "Attach images to an existing product",
 }
 
 
@@ -348,13 +352,127 @@ def handle_ai(message):
         return f"Sorry, I couldn't process your AI request: {str(e)}"
 
 
+# here
+# Add these functions to your existing code
+
+
+def format_category_list(categories):
+    """Format a list of categories for WhatsApp display"""
+    if not categories:
+        return "No categories found in your store."
+
+    result = "Your Categories:\n\n"
+    for category in categories:
+        # Count products in this category
+        product_count = Product.objects.filter(category=category).count()
+        result += f"ID: {category.id}\n"
+        result += f"Name: {category.name}\n"
+        result += f"Products: {product_count}\n\n"
+
+    return result
+
+
+def handle_add_category(store, message_parts):
+    """Handle the add category command"""
+    # Expected format: add category NAME
+    try:
+        if len(message_parts) < 3:
+            return "Invalid format. Use: add category NAME"
+
+        category_name = message_parts[2].strip()
+
+        # Check if category already exists
+        existing_category = Category.objects.filter(
+            store=store, name=category_name
+        ).first()
+        if existing_category:
+            return f"Category '{category_name}' already exists with ID: {existing_category.id}"
+
+        # Create category
+        category = Category.objects.create(store=store, name=category_name)
+
+        return f"Category added successfully!\nID: {category.id}\nName: {category_name}"
+
+    except Exception as e:
+        return f"Error adding category: {str(e)}"
+
+
+def handle_edit_category(store, message_parts):
+    """Handle the edit category command"""
+    # Expected format: edit category OLD_NAME|NEW_NAME
+    try:
+        if len(message_parts) < 3:
+            return "Invalid format. Use: edit category OLD_NAME|NEW_NAME"
+
+        name_parts = message_parts[2].split("|")
+        if len(name_parts) != 2:
+            return "Invalid format. Use: edit category OLD_NAME|NEW_NAME"
+
+        old_name = name_parts[0].strip()
+        new_name = name_parts[1].strip()
+
+        # Check if old category exists
+        try:
+            category = Category.objects.get(store=store, name=old_name)
+
+            # Check if new name already exists (but isn't the same category)
+            existing_category = Category.objects.filter(
+                store=store, name=new_name
+            ).first()
+            if existing_category and existing_category.id != category.id:
+                return f"Cannot update: A category named '{new_name}' already exists."
+
+            # Update the category
+            category.name = new_name
+            category.save()
+
+            return f"Category updated successfully!\nID: {category.id}\nNew Name: {new_name}"
+
+        except Category.DoesNotExist:
+            return f"Category '{old_name}' not found in your store."
+
+    except Exception as e:
+        return f"Error updating category: {str(e)}"
+
+
+def handle_delete_category(store, message_parts):
+    """Handle the delete category command"""
+    # Expected format: delete category NAME
+    try:
+        if len(message_parts) < 3:
+            return "Invalid format. Use: delete category NAME"
+
+        category_name = message_parts[2].strip()
+
+        try:
+            # Find the category
+            category = Category.objects.get(store=store, name=category_name)
+
+            # Check if products are using this category
+            product_count = Product.objects.filter(category=category).count()
+            if product_count > 0:
+                return f"Cannot delete: Category '{category_name}' is used by {product_count} products. Update these products first."
+
+            # Delete the category
+            category_id = category.id
+            category.delete()
+
+            return (
+                f"Category '{category_name}' (ID: {category_id}) deleted successfully."
+            )
+
+        except Category.DoesNotExist:
+            return f"Category '{category_name}' not found in your store."
+
+    except Exception as e:
+        return f"Error deleting category: {str(e)}"
+
+
 @csrf_exempt
 def message(request):
     user_whatsapp = request.POST.get("From")
     message_body = request.POST.get("Body", "").strip()
-    print("message_body", message_body)
     num_media = int(request.POST.get("NumMedia", 0))
-    print("num media", num_media)
     response = MessagingResponse()
 
     # Identify the seller from their WhatsApp number
@@ -425,6 +543,11 @@ def message(request):
         products = Product.objects.filter(store=store)
         response.message(format_product_list(products))
 
+    elif message_body.lower() == "categories":
+        # Get categories list
+        categories = Category.objects.filter(store=store)
+        response.message(format_category_list(categories))
+
     elif message_body.lower().startswith("add product"):
         # Create the product
         product, result_message = handle_add_product(store, message_parts)
@@ -446,6 +569,18 @@ def message(request):
 
     elif message_body.lower().startswith("delete product"):
         result = handle_delete_product(store, message_parts)
+        response.message(result)
+
+    elif message_body.lower().startswith("add category"):
+        result = handle_add_category(store, message_parts)
+        response.message(result)
+
+    elif message_body.lower().startswith("edit category"):
+        result = handle_edit_category(store, message_parts)
+        response.message(result)
+
+    elif message_body.lower().startswith("delete category"):
+        result = handle_delete_category(store, message_parts)
         response.message(result)
 
     elif message_body.lower() == "stats":

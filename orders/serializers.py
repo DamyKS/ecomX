@@ -9,9 +9,24 @@ from products.models import Product
 
 # A simple ProductSerializer example for nested representation.
 class ProductSerializer(serializers.ModelSerializer):
+    product_image = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
-        fields = ("id", "name", "price", "description")  # adjust as needed
+        fields = (
+            "id",
+            "name",
+            "price",
+            "description",
+            "product_image",
+        )  # adjust as needed
+
+    def get_product_image(self, obj):
+        # get all images of the product and return the url of the first one if it exists
+        images = obj.images.all()
+        if images:
+            return images[0].image.url
+        return None
 
 
 class CartItemSerializer(serializers.ModelSerializer):

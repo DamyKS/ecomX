@@ -21,6 +21,7 @@ User = get_user_model()
 from orders.models import Cart
 from stores.models import Store
 from seller_dashboard.models import Dashboard
+from orders.models import Cart, CartItem
 
 
 class RegisterView(APIView):
@@ -35,6 +36,9 @@ class RegisterView(APIView):
                 store_id = request.data.get("store_id")
                 store = Store.objects.get(id=store_id)
                 store.customers.add(user)
+                cart = Cart.objects.create(user=user, store=store)
+                cart.save()
+
             elif user_type == "seller":
                 seller_dashboard = Dashboard.objects.create(owner=user)
                 seller_dashboard.save()

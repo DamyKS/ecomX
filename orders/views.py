@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from .models import Cart, CartItem, Order
 from products.models import Product
 from stores.models import Store
-from .serializers import CartSerializer, OrderSerializer
+from .serializers import CartSerializer, OrderSerializer, ProductSerializer
 from django.db.models import Sum
 
 
@@ -25,8 +25,8 @@ class AddToCartAPIView(APIView):
 
         # Get or create an active cart for the user
         cart, created = Cart.objects.get_or_create(
-            user=user, store=store, status="active"
-        )
+            user=user, status="active"
+        )  # store=store,
 
         # Check if product already exists in the cart
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
@@ -40,6 +40,54 @@ class AddToCartAPIView(APIView):
             {"message": "Product added to cart!"}, status=status.HTTP_201_CREATED
         )
 
+    def delete(self, request):
+        user = request.user
+        product_id = request.data.get("product_id")
+        product = get_object_or_404(Product, id=product_id)
+        store = product.store
+        cart = Cart.objects.get(user=user, status="active")  # store=store,
+        cart_item = CartItem.objects.get(cart=cart, product=product)
+        cart_item.delete()
+        return Response(
+            {"message": "Product removed from cart!"}, status=status.HTTP_200_OK
+        )
+
+
+# class ViewCartAPIView(APIView):
+#     """
+#     GET /api/cart/?store_id={store_id}
+#     Retrieves all items in the user's active cart.
+#     """
+
+#     def get(self, request):
+#         user = request.user
+#         store_id = request.query_params.get("store_id")
+#         store = get_object_or_404(Store, id=store_id)
+#         try:
+#             cart = get_object_or_404(Cart, user=user, status="active")
+#         except Cart.DoesNotExist:
+#             # create cart
+#             cart = Cart.objects.create(user=user, store=store, status="active")
+
+#         cart_items = CartItem.objects.filter(cart=cart)
+#         cart_data = [
+#             {
+#                 "product_name": item.product.name,
+#                 "quantity": item.quantity,
+#                 "price": item.product.price,
+#             }
+#             for item in cart_items
+#         ]
+
+#         return Response(cart_data, status=status.HTTP_200_OK)
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from stores.models import Store
+from orders.models import Cart, CartItem
+
 
 class ViewCartAPIView(APIView):
     """
@@ -51,21 +99,29 @@ class ViewCartAPIView(APIView):
         user = request.user
         store_id = request.query_params.get("store_id")
         store = get_object_or_404(Store, id=store_id)
-        try:
-            cart = get_object_or_404(Cart, user=user, status="active")
-        except Cart.DoesNotExist:
-            # create cart
+
+        # Retrieve the active cart if it exists; otherwise, create a new one.
+        cart = Cart.objects.filter(user=user, status="active").first()
+        print(cart)
+        if not cart:
+            print("cart not gotten ")
             cart = Cart.objects.create(user=user, store=store, status="active")
 
         cart_items = CartItem.objects.filter(cart=cart)
-        cart_data = [
-            {
-                "product_name": item.product.name,
-                "quantity": item.quantity,
-                "price": item.product.price,
-            }
-            for item in cart_items
-        ]
+        cart_data = []
+        for item in cart_items:
+            # Reuse ProductSerializer to get the product_image field
+            product_serializer = ProductSerializer(
+                item.product, context={"request": request}
+            )
+            cart_data.append(
+                {
+                    "product_name": item.product.name,
+                    "quantity": item.quantity,
+                    "price": item.product.price,
+                    "product_image": product_serializer.data.get("product_image"),
+                }
+            )
 
         return Response(cart_data, status=status.HTTP_200_OK)
 
