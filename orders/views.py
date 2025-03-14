@@ -114,6 +114,83 @@ class CreateOrderAPIView(APIView):
         )
 
 
+# class ListOrderAPIView(APIView):
+#     """
+#     GET /api/orders/
+#     Retrieves all orders placed by the user.
+#     """
+
+#     def get(self, request):
+
+#         user = request.user
+#         store = get_object_or_404(Store, owner=user)
+#         orders = Order.objects.filter(store=store)
+#         orders = Order.objects.filter(user=user)
+
+#         order_data = [
+#             {
+#                 "id": order.id,
+#                 "store": order.store.name,
+#                 "total_price": order.total_price,
+#                 "status": order.status,
+#             }
+#             for order in orders
+#         ]
+
+#         return Response(order_data, status=status.HTTP_200_OK)
+
+from django.utils import timezone
+from datetime import timedelta
+
+4
+
+
+class ListOrderAPIView(APIView):
+    """
+    GET /api/store/orders/dashboard/
+    Returns a summary of orders and order history for the store dashboard.
+    """
+
+    def get(self, request):
+        user = request.user
+        store = get_object_or_404(Store, owner=user)
+
+        # Get all orders for this store
+        orders = Order.objects.filter(store=store)
+
+        # Calculate counts for the order summary
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        new_orders_count = orders.filter(created_at__gte=thirty_days_ago).count()
+        pending_orders_count = orders.filter(status="pending").count()
+        delivered_orders_count = orders.filter(status="delivered").count()
+
+        # Prepare order history data
+        order_history = []
+        for order in orders:
+            order_history.append(
+                {
+                    "order_id": order.id,
+                    "ordered_date": order.created_at.strftime("%d-%m-%Y"),
+                    "customer_name": order.user.get_full_name() or order.user.username,
+                    # "product_name": order.cart.items.first().product.name if order.cart and order.cart.items.exists() else "N/A",
+                    "total_price": str(order.total_price),
+                    "status": order.status,
+                }
+            )
+
+        # Format the response
+        response_data = {
+            "order_summary": {
+                "new_orders": new_orders_count,
+                "pending_orders": pending_orders_count,
+                "delivered": delivered_orders_count,
+            },
+            "order_history": order_history,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
 class OrderDetailAPIView(APIView):
     """
     GET /api/orders/{order_id}/
