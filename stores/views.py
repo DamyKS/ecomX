@@ -38,10 +38,10 @@ class StoreDetailView(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, id):
-        store_id = id
-        store = Store.objects.get(id=store_id)
-        serializer = StoreGetSerializer(store)
+    def get(self, request):
+        user = request.user
+        stores = Store.objects.filter(owner=user)
+        serializer = StoreGetSerializer(stores, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, id):

@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "orders",
     "payments",
     "seller_dashboard",
-    # "whatsapp_bot",
+    "whatsapp_bot",
     # 3rd party
     "rest_framework",
     "rest_framework_simplejwt",

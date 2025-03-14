@@ -73,7 +73,7 @@ urlpatterns = [
     # seller dashboard urls
     path("api/v1/seller_dashboard/", include("seller_dashboard.urls")),
     # whatsapp bot urls
-    # path("api/v1/whatsapp_bot/message", views.message, name="whatsapp_bot"),
+    path("api/v1/whatsapp_bot/message", views.message, name="whatsapp_bot"),
     # # Swagger UI
     path(
         "swagger/",
