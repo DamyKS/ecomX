@@ -616,7 +616,7 @@ def message(request):
 
     else:
         response.message(
-            f"Hello {seller.full_name}! Welcome to your store WhatsApp manager.\n"
+            f"Hello {seller.full_name}! Welcome to {store} WhatsApp manager.\n"
             "Type 'help' to see available commands."
         )
 

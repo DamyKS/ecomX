@@ -116,6 +116,7 @@ class ViewCartAPIView(APIView):
             )
             cart_data.append(
                 {
+                    "id ": item.id,
                     "product_name": item.product.name,
                     "quantity": item.quantity,
                     "price": item.product.price,
