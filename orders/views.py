@@ -5,7 +5,12 @@ from django.shortcuts import get_object_or_404
 from .models import Cart, CartItem, Order
 from products.models import Product
 from stores.models import Store
-from .serializers import CartSerializer, OrderSerializer, ProductSerializer
+from .serializers import (
+    CartSerializer,
+    OrderSerializer,
+    ProductSerializer,
+    CartItemSerializer,
+)
 from django.db.models import Sum
 
 
@@ -35,10 +40,16 @@ class AddToCartAPIView(APIView):
         else:
             cart_item.quantity = int(quantity)
         cart_item.save()
-
-        return Response(
-            {"message": "Product added to cart!"}, status=status.HTTP_201_CREATED
-        )
+        serializer = CartItemSerializer(cart_item)
+        data = serializer.data
+        temp_result = serializer.data.copy()
+        final_result = {}
+        final_result["id"] = temp_result["product"]["id"]
+        final_result["product_name"] = temp_result["product"]["name"]
+        final_result["quantity"] = temp_result["quantity"]
+        final_result["price"] = temp_result["product"]["price"]
+        final_result["product_image"] = temp_result["product"]["product_image"]
+        return Response(final_result, status=status.HTTP_201_CREATED)
 
     def delete(self, request):
         user = request.user
