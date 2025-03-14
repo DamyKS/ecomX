@@ -20,7 +20,7 @@ class StoreView(APIView):
     def get(self, request):
         user = request.user
         stores = Store.objects.filter(owner=user)
-        serializer = StoreGetSerializer(stores, many=True)
+        serializer = StoreGetSerializer(stores, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -39,9 +39,9 @@ class StoreDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
-        user = request.user
-        stores = Store.objects.filter(owner=user)
-        serializer = StoreGetSerializer(stores, many=True, context={"request": request})
+        store_id = id
+        store = Store.objects.get(id=store_id)
+        serializer = StoreGetSerializer(store, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, id):
