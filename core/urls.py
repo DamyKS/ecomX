@@ -22,7 +22,8 @@ from django.conf.urls.static import static
 # from bank.views import AcctDetailView
 
 # from bank.views import TransferAPIView
-from products.views import CategoryAPIView
+from products.views import CategoryAPIView, CategoryDetailAPIView
+
 from whatsapp_bot import views
 
 schema_view = get_schema_view(
@@ -60,6 +61,11 @@ urlpatterns = [
     # products and categories urls
     path("api/v1/products/", include("products.urls")),
     path("api/v1/categories/", CategoryAPIView.as_view(), name="categories"),
+    path(
+        "api/v1/categories/<int:category_id>/",
+        CategoryDetailAPIView.as_view(),
+        name="category-detail",
+    ),
     # orders urls
     path("api/v1/orders/", include("orders.urls")),
     # payments urls
