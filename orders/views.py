@@ -98,6 +98,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from stores.models import Store
 from orders.models import Cart, CartItem
+from seller_dashboard.models import Dashboard
 
 
 class ViewCartAPIView(APIView):
@@ -218,8 +219,6 @@ class CreateOrderAPIView(APIView):
 
 from django.utils import timezone
 from datetime import timedelta
-
-4
 
 
 class ListOrderAPIView(APIView):

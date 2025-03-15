@@ -524,18 +524,19 @@ def message(request):
 
     # Process various commands
     if message_body.lower() == "help":
-        help_text = "*Available commands*:\n\n"
+        help_text = f"Welcome to {store.name}\n *Available commands*:\n\n"
         for cmd, desc in COMMANDS.items():
             help_text += f"*{cmd}* - {desc}\n\n"
         response.message(help_text)
     elif message_body.lower().startswith("ai "):
         ai_response = handle_ai(message_body)
+        ai_response = "*AI Response:*\n\n" + ai_response
         response.message(ai_response)
         return HttpResponse(str(response))
 
     elif message_body.lower() == "orders":
         # Get recent orders
-        recent_orders = Order.objects.filter(store=store).order_by("-created_at")[:5]
+        recent_orders = Order.objects.filter(store=store).order_by("-created_at")[:6]
         response.message(format_order_list(recent_orders))
 
     elif message_body.lower() == "products":
