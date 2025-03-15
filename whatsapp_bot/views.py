@@ -81,7 +81,7 @@ def format_order_list(orders):
 
     result = "Recent Orders:\n\n"
     for order in orders:
-        result += f"Order #{order.id} - ${order.total_price:.2f}\n"
+        result += f"Order #{order.id} - N{order.total_price:.2f}\n"
         result += f"Status: {order.status}\n"
         result += f"Date: {order.created_at.strftime('%Y-%m-%d')}\n"
 
@@ -521,10 +521,10 @@ def message(request):
     # Process text commands
     message_parts = message_body.lower().split(" ", 2)
     command = message_parts[0] if message_parts else ""
-
+    # ✅
     # Process various commands
     if message_body.lower() == "help":
-        help_text = f"Welcome to *{store.name}*\n *Available commands*:\n\n"
+        help_text = f"Welcome to *{store.name}*\n\n *Available commands*:\n\n"
         for cmd, desc in COMMANDS.items():
             help_text += f"*{cmd}* - {desc}\n\n"
         response.message(help_text)
