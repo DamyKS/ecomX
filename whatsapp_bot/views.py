@@ -481,7 +481,7 @@ def message(request):
     if not seller:
         response.message(
             "Sorry, your WhatsApp number is not registered with any seller account. "
-            "Please register your WhatsApp number in your account settings."
+            "Please register your WhatsApp number in your dashboard settings."
         )
         return HttpResponse(str(response))
 
@@ -524,7 +524,7 @@ def message(request):
 
     # Process various commands
     if message_body.lower() == "help":
-        help_text = f"Welcome to {store.name}\n *Available commands*:\n\n"
+        help_text = f"Welcome to *{store.name}*\n *Available commands*:\n\n"
         for cmd, desc in COMMANDS.items():
             help_text += f"*{cmd}* - {desc}\n\n"
         response.message(help_text)
@@ -617,7 +617,7 @@ def message(request):
 
     else:
         response.message(
-            f"Hello {seller.full_name}! Welcome to {store.name} WhatsApp manager.\n"
+            f"Hello {seller.full_name}! Welcome to *{store.name}* WhatsApp manager.\n\n"
             "Type *'help'* to see available commands."
         )
 
