@@ -91,7 +91,7 @@ def format_order_list(orders):
             result += "Products:\n"
 
             for item in cart_items:
-                result += f"- {item.quantity}x {item.product.name} (${item.product.price:.2f})\n"
+                result += f"- {item.quantity}x {item.product.name} (N{item.product.price:.2f})\n"
 
         result += "\n"
 
@@ -108,7 +108,7 @@ def format_product_list(products):
         result += f"ID: {product.id}\n"
         result += f"Name: {product.name}\n"
         result += f"Category: {product.category.name if product.category else 'None'}\n"
-        result += f"Price: ${product.price:.2f}\n"
+        result += f"Price: N{product.price:.2f}\n"
         result += f"Description: {product.description}\n"
         result += f"Stock: {product.stock}\n"
         result += f"Images: {product.images.count()}\n\n"
@@ -152,7 +152,7 @@ def handle_add_product(store, message_parts):
 
         return (
             product,
-            f"Product added successfully!\nID: {product.id}\nName: {name}\nPrice: ${price:.2f}",
+            f"Product added successfully!\nID: {product.id}\nName: {name}\nPrice: N{price:.2f}",
         )
 
     except (IndexError, ValueError) as e:
@@ -191,7 +191,7 @@ def handle_update_product(store, message_parts):
             product.stock = stock
             product.save()
 
-            return f"Product updated successfully!\nID: {product.id}\nName: {name}\nPrice: ${price:.2f}"
+            return f"Product updated successfully!\nID: {product.id}\nName: {name}\nPrice: N{price:.2f}"
         except Product.DoesNotExist:
             return f"Product with ID {product_id} not found in your store."
 
@@ -297,7 +297,7 @@ def get_store_stats(store):
     result += f"Store Name: {store.name}\n"
     result += f"Total Products: {total_products}\n"
     result += f"Total Orders: {total_orders}\n"
-    result += f"Total Revenue: ${revenue:.2f}\n"
+    result += f"Total Revenue: N{revenue:.2f}\n"
     result += f"Total Customers: {recent_customers}\n"
     result += f"Recent Orders: {recent_order_count}\n"
 
