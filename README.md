@@ -13,7 +13,7 @@ ecomX addresses key challenges for SMEs entering the digital marketplace by offe
 ## Features
 
 - **Backend APIs:** Developed using Django REST Framework to handle core functionalities like product listings, order processing, and payment workflows.
-- **Real-Time Communication:** Integrated Twilio to power a WhatsApp bot that simplifies seller communication and support.
+- **Smart Store Management:** Integrated Twilio to power a WhatsApp bot that simplifies store management.
 - **Rapid Prototyping:** Created collaboratively with TEAM PRIMAX during a hackathon to quickly address common challenges faced by SMEs.
 
 ## Tech Stack & Tools
